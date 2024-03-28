@@ -78,11 +78,11 @@ for svc in dev.services:
 print("Press 'q' to quit...")
 
 try:
-    testService = dev.getServiceByUUID(UUID('D90BB629-423A-4BB2-87A6-CC0C3C9853B3'))
+    testService = dev.getServiceByUUID(UUID(0xfff0))
     for ch in testService.getCharacteristics():
         print(str(ch))
 
-    char_uuid = '34711F5C-6739-4C6F-8F28-096E858542A4'  # 这是特征的UUID
+    char_uuid = 0xfff1  # 这是特征的UUID
     cccd_uuid = '00002902-0000-1000-8000-00805f9b34fb'  # 这是CCCD的UUID
 
     enable_notifications(dev, char_uuid, cccd_uuid)
@@ -98,7 +98,7 @@ try:
                 break
         time.sleep(0.1)
 
-    ch = dev.getCharacteristics(uuid=UUID('34711F5C-6739-4C6F-8F28-096E858542A4'))[0]
+    ch = dev.getCharacteristics(uuid=UUID(0xfff1))[0]
     if (ch.supportsRead()):
         print (ch.read())
 #
