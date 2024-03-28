@@ -27,6 +27,9 @@ def enable_notifications(peripheral, char_uuid, cccd_uuid):
         # 执行写入操作
         cccd.write(notification_enable_value, withResponse=True)
         print(f"Successfully wrote to CCCD to enable notifications for {char_uuid}")
+
+    except Exception as e:
+        print(f"Error enabling notifications for characteristic {char_uuid}: {e}")
     
 
 class MyDelegate(DefaultDelegate):
