@@ -82,7 +82,7 @@ try:
     for ch in testService.getCharacteristics():
         print(str(ch))
 
-    char_uuid = 0xfff1  # 这是特征的UUID
+    char_uuid = 0xfff2  # 这是特征的UUID
     cccd_uuid = '00002902-0000-1000-8000-00805f9b34fb'  # 这是CCCD的UUID
 
     enable_notifications(dev, char_uuid, cccd_uuid)
@@ -98,7 +98,7 @@ try:
                 break
         time.sleep(0.1)
 
-    ch = dev.getCharacteristics(uuid=UUID(0xfff1))[0]
+    ch = dev.getCharacteristics(uuid=UUID(0xfff2))[0]
     if (ch.supportsRead()):
         print (ch.read())
 #
