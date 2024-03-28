@@ -12,8 +12,9 @@ def enable_notifications(peripheral, char_uuid, cccd_uuid):
         print(f"Characteristic {char_uuid} value: {val}")
 
     cccd = ch.getDescriptors(forUUID=UUID(cccd_uuid))[0]
-    cccd.write(bytes([0x02, 0x00]), withResponse=True)
-    print(f"Enabled notifications for {char_uuid}.")
+    write_value = bytes([0x02, 0x00])
+    cccd.write(write_value, withResponse=True)
+    print(f"Enabled notifications for {char_uuid} with value: {write_value.hex()}")
     
 class MyDelegate(DefaultDelegate):
     def __init__(self):
