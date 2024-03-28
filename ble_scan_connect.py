@@ -6,14 +6,27 @@ import select
 import time
 
 def enable_notifications(peripheral, char_uuid, cccd_uuid):
-    ch = peripheral.getCharacteristics(uuid=UUID(char_uuid))[0]
-    if ch.supportsRead():
-        val = ch.read()
-        print(f"Characteristic {char_uuid} value: {val}")
+    try:
+        # 获取特征对象
+        ch = peripheral.getCharacteristics(uuid=UUID(char_uuid))[0]
+        print(f"Found characteristic {char_uuid}")
 
-    cccd = ch.getDescriptors(forUUID=UUID(cccd_uuid))[0]
-    cccd.write(bytes([0x02, 0x00]), withResponse=True)
-    print(f"Enabled notifications for {char_uuid}.")
+        # 尝试读取当前特征的值（如果支持）
+        if ch.supportsRead():
+            current_value = ch.read()
+            print(f"Current value of characteristic {char_uuid}: {current_value}")
+
+        # 查找CCCD
+        cccd = ch.getDescriptors(forUUID=UUID(cccd_uuid))[0]
+        print(f"Found CCCD descriptor for characteristic {char_uuid}")
+
+        # 准备写入的值，这里是启用通知的标准值0x0001或0x0002（这里用0x0002代表通知）
+        notification_enable_value = bytes([0x02, 0x00])
+        print(f"Preparing to write to CCCD to enable notifications: {notification_enable_value}")
+
+        # 执行写入操作
+        cccd.write(notification_enable_value, withResponse=True)
+        print(f"Successfully wrote to CCCD to enable notifications for {char_uuid}")
     
 class MyDelegate(DefaultDelegate):
     def __init__(self):
@@ -61,12 +74,12 @@ for svc in dev.services:
 print("Press 'q' to quit...")
 
 try:
-    testService = dev.getServiceByUUID(UUID(0xfff0))
+    testService = dev.getServiceByUUID(UUID('D90BB629-423A-4BB2-87A6-CC0C3C9853B3'))
     for ch in testService.getCharacteristics():
         print(str(ch))
 
-    char_uuid = 0xfff1 
-    cccd_uuid = '00002902-0000-1000-8000-00805f9b34fb'
+    char_uuid = '34711F5C-6739-4C6F-8F28-096E858542A4'  # 这是特征的UUID
+    cccd_uuid = '00002902-0000-1000-8000-00805f9b34fb'  # 这是CCCD的UUID
 
     enable_notifications(dev, char_uuid, cccd_uuid)
 
@@ -81,7 +94,7 @@ try:
                 break
         time.sleep(0.1)
 
-    ch = dev.getCharacteristics(uuid=UUID(0xfff1))[0]
+    ch = dev.getCharacteristics(uuid=UUID('34711F5C-6739-4C6F-8F28-096E858542A4'))[0]
     if (ch.supportsRead()):
         print (ch.read())
 #
