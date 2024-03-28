@@ -1,6 +1,27 @@
-# ble_scan_connect.py:
 from bluepy.btle import Peripheral, UUID
 from bluepy.btle import Scanner, DefaultDelegate
+
+import sys
+import select
+import time
+
+def enable_notifications(peripheral, char_uuid, cccd_uuid):
+    ch = peripheral.getCharacteristics(uuid=UUID(char_uuid))[0]
+    if ch.supportsRead():
+        val = ch.read()
+        print(f"Characteristic {char_uuid} value: {val}")
+
+    cccd = ch.getDescriptors(forUUID=UUID(cccd_uuid))[0]
+    cccd.write(bytes([0x02, 0x00]), withResponse=True)
+    print(f"Enabled notifications for {char_uuid}.")
+    
+class MyDelegate(DefaultDelegate):
+    def __init__(self):
+        DefaultDelegate.__init__(self)
+
+    def handleNotification(self, cHandle, data):
+        print("Received notification from handle", cHandle, "with data", data)
+
 
 class ScanDelegate(DefaultDelegate):
     def __init__(self):
@@ -25,23 +46,49 @@ number = input('Enter your device number: ')
 print ('Device', number)
 num = int(number)
 print (addr[num])
+
+
 #
 print ("Connecting...")
 dev = Peripheral(addr[num], 'random')
-#
+dev.withDelegate(MyDelegate())
+
 print ("Services...")
 for svc in dev.services:
     print (str(svc))
 #
+
+print("Press 'q' to quit...")
+
 try:
     testService = dev.getServiceByUUID(UUID(0xfff0))
     for ch in testService.getCharacteristics():
-        print (str(ch))
-#
+        print(str(ch))
+
+    char_uuid = 0xfff1 
+    cccd_uuid = '00002902-0000-1000-8000-00805f9b34fb'
+
+    enable_notifications(dev, char_uuid, cccd_uuid)
+
+    while True:
+        if dev.waitForNotifications(1.0):
+            # handleNotification() was called
+            continue
+        print("Waiting for notifications...")
+        if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+            line = sys.stdin.readline()
+            if line.strip().lower() == 'q':
+                break
+        time.sleep(0.1)
+
     ch = dev.getCharacteristics(uuid=UUID(0xfff1))[0]
     if (ch.supportsRead()):
         print (ch.read())
 #
-finally:
-    dev.disconnect()
+except Exception as e:
+    print(f"An error occurred: {e}")
 
+
+finally:
+    print("Disconnecting...")
+    dev.disconnect()
