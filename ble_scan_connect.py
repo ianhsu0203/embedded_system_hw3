@@ -34,11 +34,11 @@ for svc in dev.services:
     print (str(svc))
 #
 try:
-    testService = dev.getServiceByUUID(UUID('D90BB629-423A-4BB2-87A6-CC0C3C9853B3'))
+    testService = dev.getServiceByUUID(UUID(0xfff0))
     for ch in testService.getCharacteristics():
         print (str(ch))
 #
-    ch = dev.getCharacteristics(uuid=UUID('34711F5C-6739-4C6F-8F28-096E858542A4'))[0]
+    ch = dev.getCharacteristics(uuid=UUID(0xfff1))[0]
     if (ch.supportsRead()):
         print (ch.read())
 #
