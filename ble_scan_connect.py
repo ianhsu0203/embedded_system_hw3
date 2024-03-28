@@ -28,6 +28,7 @@ def enable_notifications(peripheral, char_uuid, cccd_uuid):
         cccd.write(notification_enable_value, withResponse=True)
         print(f"Successfully wrote to CCCD to enable notifications for {char_uuid}")
     
+
 class MyDelegate(DefaultDelegate):
     def __init__(self):
         DefaultDelegate.__init__(self)
